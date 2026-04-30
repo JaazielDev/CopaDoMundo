@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa do Mundo 2026 — Portal Interativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #2E7D32;
+    --verde-claro: #4CAF50;
+    --verde-campo: #1B5E20;
+    --verde-linha: #388E3C;
+    --ouro: #FFD700;
+    --ouro-escuro: #FFA000;
+    --azul: #1565C0;
+    --vermelho: #C62828;
+    --branco: #FFFFFF;
+    --preto: #0A0A0A;
+    --cinza-escuro: #1A1A1A;
+    --bebas: 'Bebas Neue', sans-serif;
+    --inter: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--inter);
+    background: var(--verde-campo);
+    color: var(--branco);
+    overflow-x: hidden;
+  }
+
+  /* ===== CAMPO FUNDO ===== */
+  .field-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    background: linear-gradient(180deg, #1B5E20 0%, #2E7D32 30%, #1B5E20 50%, #2E7D32 70%, #1B5E20 100%);
+    overflow: hidden;
+  }
+  .field-bg::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(90deg, transparent 0px, transparent 49px, rgba(255,255,255,0.03) 49px, rgba(255,255,255,0.03) 50px);
+  }
+  .field-stripes {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(180deg, rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 80px, transparent 80px, transparent 160px);
+  }
+  .field-center-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgba(255,255,255,0.15); }
+  .field-center-circle {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 200px; height: 200px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1);
+  }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--ouro);
+    padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px;
+  }
+  .nav-logo { font-family: var(--bebas); font-size: 1.8rem; color: var(--ouro); letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
+  .nav-links { display: flex; gap: 0; list-style: none; }
+  .nav-links a {
+    color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.73rem; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; padding: 0 12px; height: 60px;
+    display: flex; align-items: center; transition: all 0.2s; border-bottom: 3px solid transparent;
+  }
+  .nav-links a:hover { color: var(--ouro); border-bottom-color: var(--ouro); background: rgba(255,215,0,0.05); }
+
+  /* ===== SITE CONTENT ===== */
+  .site-content { position: relative; z-index: 1; }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 80px 2rem 2rem; position: relative;
+  }
+  .goal-top { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: min(700px, 90vw); }
+  .goal-top .crossbar { height: 10px; background: linear-gradient(180deg, #f0f0f0, #bbb); border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); position: relative; }
+  .goal-top .post-left, .goal-top .post-right { position: absolute; top: 0; width: 10px; height: 120px; background: linear-gradient(90deg, #f0f0f0, #bbb); border-radius: 0 0 4px 4px; box-shadow: 4px 0 20px rgba(0,0,0,0.3); }
+  .goal-top .post-left { left: 0; } .goal-top .post-right { right: 0; }
+  .goal-top .net { position: absolute; top: 10px; left: 10px; right: 10px; height: 110px; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.12) 0, rgba(255,255,255,0.12) 1px, transparent 1px, transparent 20px), repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0, rgba(255,255,255,0.12) 1px, transparent 1px, transparent 20px); }
+
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ouro); color: var(--preto); font-family: var(--bebas); font-size: 1rem; letter-spacing: 2px; padding: 6px 20px; border-radius: 30px; margin-bottom: 1.5rem; margin-top: 140px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+  .hero h1 { font-family: var(--bebas); font-size: clamp(4rem, 12vw, 9rem); line-height: 0.9; letter-spacing: 4px; color: var(--branco); text-shadow: 0 0 60px rgba(0,0,0,0.8), 4px 4px 0 rgba(0,0,0,0.5); margin-bottom: 0.5rem; }
+  .hero h1 span { color: var(--ouro); display: block; }
+  .hero-sub { font-size: 1.1rem; font-weight: 500; color: rgba(255,255,255,0.8); margin-bottom: 2.5rem; letter-spacing: 3px; text-transform: uppercase; }
+
+  .countdown { display: flex; gap: 1rem; justify-content: center; margin-bottom: 3rem; }
+  .cd-box { background: rgba(0,0,0,0.6); border: 2px solid var(--ouro); border-radius: 12px; padding: 1rem 1.5rem; text-align: center; min-width: 80px; backdrop-filter: blur(8px); }
+  .cd-num { font-family: var(--bebas); font-size: 3rem; color: var(--ouro); line-height: 1; display: block; }
+  .cd-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.6); text-transform: uppercase; }
+
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .btn-primary { background: var(--ouro); color: var(--preto); font-family: var(--bebas); font-size: 1.1rem; letter-spacing: 2px; padding: 14px 36px; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 4px 20px rgba(255,215,0,0.4); }
+  .btn-primary:hover { background: var(--ouro-escuro); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,215,0,0.5); }
+  .btn-outline { background: transparent; color: var(--branco); font-family: var(--bebas); font-size: 1.1rem; letter-spacing: 2px; padding: 12px 36px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+  .btn-outline:hover { border-color: var(--branco); background: rgba(255,255,255,0.1); }
+
+  /* ===== SEÇÕES ===== */
+  .section { padding: 80px 2rem; max-width: 1200px; margin: 0 auto; }
+  .section-glass { background: rgba(0,0,0,0.55); backdrop-filter: blur(16px); border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 80px 0; }
+  .section-header { text-align: center; margin-bottom: 3rem; }
+  .section-tag { display: inline-block; background: var(--ouro); color: var(--preto); font-family: var(--bebas); font-size: 0.85rem; letter-spacing: 3px; padding: 4px 16px; border-radius: 20px; margin-bottom: 0.75rem; }
+  .section-title { font-family: var(--bebas); font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 3px; color: var(--branco); line-height: 1; }
+  .section-desc { color: rgba(255,255,255,0.65); font-size: 1rem; margin-top: 0.75rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .section-divider { height: 2px; background: linear-gradient(90deg, transparent, var(--ouro), transparent); opacity: 0.3; }
+
+  /* ===== STATS BAR ===== */
+  .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; background: rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; margin-bottom: 3rem; }
+  .stat-item { background: rgba(0,0,0,0.5); padding: 1.5rem; text-align: center; }
+  .stat-num { font-family: var(--bebas); font-size: 2.8rem; color: var(--ouro); line-height: 1; display: block; }
+  .stat-lbl { font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.55); text-transform: uppercase; margin-top: 4px; }
+
+  /* ===== PROGRAMAÇÃO ===== */
+  .schedule-grid { display: grid; gap: 1rem; }
+  .match-card { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 120px 1fr auto; align-items: center; gap: 1.5rem; transition: all 0.2s; backdrop-filter: blur(8px); }
+  .match-card:hover { border-color: var(--ouro); background: rgba(255,215,0,0.05); transform: translateX(4px); }
+  .match-card.final { border-color: var(--ouro); background: rgba(255,215,0,0.08); }
+  .match-date { text-align: center; }
+  .match-date .date { font-family: var(--bebas); font-size: 1.3rem; color: var(--ouro); line-height: 1; }
+  .match-date .time { font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: 600; }
+  .match-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: rgba(255,215,0,0.15); color: var(--ouro); text-transform: uppercase; margin-top: 4px; }
+  .match-teams { font-family: var(--bebas); font-size: 1.4rem; letter-spacing: 1px; color: var(--branco); margin-bottom: 4px; }
+  .match-venue { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+  .match-links { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .watch-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--branco); font-size: 0.72rem; font-weight: 700; padding: 6px 12px; text-decoration: none; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
+  .watch-btn:hover { background: var(--ouro); color: var(--preto); border-color: var(--ouro); }
+  .add-link-btn { background: rgba(255,215,0,0.1); border: 1px dashed var(--ouro); border-radius: 8px; color: var(--ouro); font-size: 0.7rem; font-weight: 700; padding: 5px 10px; cursor: pointer; transition: all 0.2s; }
+  .add-link-btn:hover { background: rgba(255,215,0,0.2); }
+
+  /* ===== HISTÓRIA ===== */
+
+
+  /* ===== FIGURINHAS ===== */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; justify-items: center; }
+  .efootball-card { width: 180px; height: 260px; border-radius: 16px; position: relative; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; transform-style: preserve-3d; }
+  .efootball-card:hover { transform: translateY(-8px) rotateY(5deg); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .card-inner { width: 100%; height: 100%; border-radius: 16px; overflow: hidden; position: relative; border: 2px solid rgba(255,255,255,0.15); }
+  .card-lenda .card-inner { background: linear-gradient(160deg, #7B3F00 0%, #FFD700 40%, #4A1B0C 100%); border-color: #FFD700; }
+  .card-ouro .card-inner { background: linear-gradient(160deg, #1a237e 0%, #ffd700 50%, #0d1b4b 100%); border-color: #FFD700; }
+  .card-prata .card-inner { background: linear-gradient(160deg, #263238 0%, #90A4AE 50%, #102027 100%); border-color: #90A4AE; }
+  .card-shine { position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); transform: skewX(-15deg); transition: left 0.6s; }
+  .efootball-card:hover .card-shine { left: 120%; }
+  .card-badge-rarity { position: absolute; top: 10px; left: 10px; font-family: var(--bebas); font-size: 0.65rem; letter-spacing: 2px; padding: 3px 10px; border-radius: 20px; z-index: 2; }
+  .card-lenda .card-badge-rarity { background: #FFD700; color: #000; }
+  .card-ouro .card-badge-rarity { background: #FFA000; color: #000; }
+  .card-prata .card-badge-rarity { background: #78909C; color: #fff; }
+  .card-overall { position: absolute; top: 8px; right: 10px; font-family: var(--bebas); font-size: 2rem; color: var(--branco); line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 2; }
+  .card-pos-badge { position: absolute; top: 38px; right: 10px; font-family: var(--bebas); font-size: 0.75rem; color: rgba(255,255,255,0.8); letter-spacing: 1px; z-index: 2; }
+  .card-player-avatar { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); width: 110px; height: 110px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-family: var(--bebas); font-size: 2.5rem; color: rgba(255,255,255,0.6); z-index: 2; }
+  .card-info { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); padding: 10px 10px 8px; border-radius: 0 0 14px 14px; z-index: 2; }
+  .card-name { font-family: var(--bebas); font-size: 1.05rem; letter-spacing: 1px; color: var(--branco); text-align: center; line-height: 1; margin-bottom: 4px; }
+  .card-country { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.6); text-align: center; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .card-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .card-stat { text-align: center; }
+  .stat-val { font-family: var(--bebas); font-size: 1rem; color: var(--ouro); line-height: 1; display: block; }
+  .stat-key { font-size: 0.55rem; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Modal jogador */
+  .card-detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+  .card-detail-overlay.active { display: flex; }
+  .card-detail-modal { background: linear-gradient(160deg, #1a1a1a, #2d2d2d); border: 2px solid var(--ouro); border-radius: 24px; padding: 2.5rem; max-width: 500px; width: 90%; position: relative; animation: modalIn 0.3s ease; }
+  @keyframes modalIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.1); border: none; color: var(--branco); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: var(--ouro); color: var(--preto); }
+  .modal-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .modal-avatar-placeholder { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--ouro); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-family: var(--bebas); font-size: 2rem; color: var(--ouro); flex-shrink: 0; }
+  .modal-name { font-family: var(--bebas); font-size: 2rem; letter-spacing: 2px; color: var(--branco); line-height: 1; }
+  .modal-country { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+  .modal-era { font-size: 0.75rem; color: var(--ouro); font-weight: 600; margin-top: 2px; }
+  .stats-bars { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
+  .stat-bar-row { display: grid; grid-template-columns: 70px 1fr 30px; align-items: center; gap: 10px; }
+  .stat-bar-label { font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-bar-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+  .stat-bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+  .stat-bar-num { font-family: var(--bebas); font-size: 1rem; color: var(--ouro); text-align: right; }
+  .modal-quote { background: rgba(255,215,0,0.06); border-left: 3px solid var(--ouro); padding: 1rem; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: rgba(255,255,255,0.75); font-style: italic; }
+  .modal-achievements { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .achievement-pill { background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.3); border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 700; color: var(--ouro); }
+
+  /* ===== VÍDEOS ===== */
+  .videos-filter { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+  .filter-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 30px; color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 600; padding: 8px 20px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
+  .filter-btn.active, .filter-btn:hover { background: var(--ouro); color: var(--preto); border-color: var(--ouro); }
+  .videos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+  .video-card { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; transition: all 0.3s; backdrop-filter: blur(8px); }
+  .video-card:hover { transform: translateY(-4px); border-color: var(--ouro); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .video-thumb { position: relative; aspect-ratio: 16/9; overflow: hidden; cursor: pointer; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+  .video-play-btn { width: 56px; height: 56px; background: rgba(255,215,0,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--preto); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+  .video-year-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: var(--ouro); font-family: var(--bebas); font-size: 0.9rem; padding: 3px 10px; border-radius: 8px; letter-spacing: 1px; }
+  .video-type-tag { position: absolute; top: 10px; right: 10px; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .tag-goal { background: #C62828; color: #fff; }
+  .tag-final { background: #1565C0; color: #fff; }
+  .tag-moment { background: #2E7D32; color: #fff; }
+  .video-info { padding: 1rem 1.25rem; }
+  .video-title { font-family: var(--bebas); font-size: 1.15rem; letter-spacing: 1px; color: var(--branco); margin-bottom: 6px; line-height: 1.2; }
+  .video-desc { font-size: 0.8rem; color: rgba(255,255,255,0.55); line-height: 1.5; margin-bottom: 12px; }
+  .video-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .video-link-btn { background: var(--ouro); color: var(--preto); font-size: 0.78rem; font-weight: 700; padding: 8px 16px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+  .video-link-btn:hover { background: var(--ouro-escuro); }
+  .video-add-btn { background: rgba(255,215,0,0.1); border: 1px dashed var(--ouro); color: var(--ouro); font-size: 0.75rem; font-weight: 700; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+
+  /* ===== ESTÁDIOS ===== */
+  .stadiums-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .stadium-card { background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 1.25rem; transition: all 0.2s; display: flex; gap: 1rem; align-items: flex-start; backdrop-filter: blur(6px); }
+  .stadium-card:hover { border-color: var(--ouro); background: rgba(255,215,0,0.04); transform: translateY(-2px); }
+  .stadium-icon { font-size: 2rem; flex-shrink: 0; }
+  .stadium-name { font-family: var(--bebas); font-size: 1.05rem; letter-spacing: 1px; color: var(--branco); line-height: 1.1; margin-bottom: 4px; }
+  .stadium-detail { font-size: 0.75rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+  .stadium-cap { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,215,0,0.1); color: var(--ouro); font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 6px; }
+
+  /* ===== RECORDES ===== */
+  .records-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+  .record-card { background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden; backdrop-filter: blur(8px); transition: all 0.2s; }
+  .record-card:hover { border-color: var(--ouro); transform: translateY(-3px); }
+  .record-card::before { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle at top right, rgba(255,215,0,0.08), transparent 70%); }
+  .record-icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+  .record-value { font-family: var(--bebas); font-size: 2.2rem; color: var(--ouro); letter-spacing: 2px; line-height: 1; margin-bottom: 4px; }
+  .record-name { font-size: 0.85rem; font-weight: 700; color: var(--branco); margin-bottom: 4px; }
+  .record-desc { font-size: 0.75rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+  /* ===== SELEÇÕES ===== */
+  .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .team-card { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem; text-align: center; transition: all 0.2s; cursor: pointer; backdrop-filter: blur(8px); }
+  .team-card:hover { transform: translateY(-4px); border-color: var(--ouro); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .team-flag { font-size: 3.5rem; display: block; margin-bottom: 0.75rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
+  .team-name { font-family: var(--bebas); font-size: 1.4rem; letter-spacing: 2px; color: var(--branco); margin-bottom: 4px; }
+  .team-titles { font-family: var(--bebas); font-size: 2.5rem; color: var(--ouro); line-height: 1; display: block; margin-bottom: 4px; }
+  .team-titles-lbl { font-size: 0.7rem; color: rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .team-cups-row { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .year-chip { background: rgba(255,215,0,0.12); color: var(--ouro); font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 8px; letter-spacing: 0.5px; }
+
+  /* ===== MODALS ===== */
+  .add-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+  .add-modal.active { display: flex; }
+  .add-modal-inner { background: #1a1a1a; border: 2px solid var(--ouro); border-radius: 20px; padding: 2rem; max-width: 480px; width: 90%; animation: modalIn 0.3s ease; position: relative; }
+  .add-modal-inner h3 { font-family: var(--bebas); font-size: 1.5rem; letter-spacing: 2px; color: var(--ouro); margin-bottom: 1.5rem; }
+  .add-modal-inner label { display: block; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .add-modal-inner input, .add-modal-inner select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: var(--branco); font-family: var(--inter); font-size: 0.9rem; padding: 10px 14px; margin-bottom: 1rem; outline: none; transition: border-color 0.2s; }
+  .add-modal-inner input:focus, .add-modal-inner select:focus { border-color: var(--ouro); }
+  .add-modal-inner select option { background: #1a1a1a; }
+  .modal-btns { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem; }
+  .modal-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-family: var(--bebas); font-size: 1rem; letter-spacing: 1px; padding: 10px 24px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+  .modal-cancel:hover { border-color: var(--branco); color: var(--branco); }
+  .modal-confirm { background: var(--ouro); border: none; color: var(--preto); font-family: var(--bebas); font-size: 1rem; letter-spacing: 1px; padding: 10px 24px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+  .modal-confirm:hover { background: var(--ouro-escuro); }
+
+  /* game-start-btn used by quiz */
+  .game-start-btn { background: var(--ouro); color: var(--preto); font-family: var(--bebas); font-size: 1.2rem; letter-spacing: 2px; padding: 14px 40px; border: none; border-radius: 50px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(255,215,0,0.3); }
+  .game-start-btn:hover { background: var(--ouro-escuro); transform: scale(1.05); }
+  @keyframes ballBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+  /* ===== FOOTER ===== */
+  .footer-goal { position: relative; padding: 0 2rem; display: flex; justify-content: center; }
+  .goal-bottom { width: min(700px, 90vw); }
+  .goal-bottom .field-area { height: 40px; background: linear-gradient(180deg, rgba(27,94,32,0.5), rgba(27,94,32,0.8)); border: 1px solid rgba(255,255,255,0.08); border-bottom: none; margin: 0 40px; }
+  .goal-bottom .crossbar-b { height: 10px; background: linear-gradient(180deg, #bbb, #f0f0f0); border-radius: 4px; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); position: relative; }
+  .goal-bottom .post-left-b, .goal-bottom .post-right-b { position: absolute; bottom: 0; width: 10px; height: 100px; background: linear-gradient(90deg, #bbb, #f0f0f0); border-radius: 4px 4px 0 0; }
+  .goal-bottom .post-left-b { left: 0; } .goal-bottom .post-right-b { right: 0; }
+  .goal-bottom .net-b { position: absolute; bottom: 10px; left: 10px; right: 10px; height: 90px; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.12) 0, rgba(255,255,255,0.12) 1px, transparent 1px, transparent 20px), repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0, rgba(255,255,255,0.12) 1px, transparent 1px, transparent 20px); }
+
+  footer { background: rgba(0,0,0,0.9); border-top: 2px solid var(--ouro); padding: 3rem 2rem 2rem; text-align: center; position: relative; z-index: 1; }
+  .footer-logo { font-family: var(--bebas); font-size: 2.5rem; letter-spacing: 4px; color: var(--ouro); display: block; margin-bottom: 0.5rem; }
+  .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0; }
+  .footer-links a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--ouro); }
+  .footer-copy { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 1rem; }
+
+  /* ===== REVEAL ===== */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* =====================================================
+     ===== NOVA SEÇÃO: LINHA DO TEMPO COM BOLA =====
+     ===================================================== */
+  #timeline-section {
+    position: relative;
+    z-index: 1;
+    padding: 80px 0;
+  }
+
+  .timeline-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+  }
+
+  /* Trilho central */
+  .timeline-track {
+    position: relative;
+    padding: 2rem 0;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, transparent, var(--ouro) 10%, var(--ouro) 90%, transparent);
+    transform: translateX(-50%);
+    border-radius: 4px;
+  }
+
+  /* Bola de futebol animada na linha */
+  .timeline-ball {
+    position: sticky;
+    top: 50%;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    height: 0;
+    overflow: visible;
+  }
+
+  .timeline-ball-icon {
+    width: 56px;
+    height: 56px;
+    background: radial-gradient(circle at 35% 35%, #fff 0%, #ddd 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 0 0 4px var(--ouro), 0 8px 32px rgba(0,0,0,0.6);
+    transform: translateY(-50%);
+    animation: ballSpin 4s linear infinite, ballGlow 2s ease-in-out infinite alternate;
+    position: relative;
+    z-index: 20;
+    cursor: default;
+  }
+
+  @keyframes ballSpin {
+    from { transform: translateY(-50%) rotate(0deg); }
+    to { transform: translateY(-50%) rotate(360deg); }
+  }
+
+  @keyframes ballGlow {
+    from { box-shadow: 0 0 0 4px var(--ouro), 0 8px 32px rgba(255,215,0,0.3); }
+    to   { box-shadow: 0 0 0 6px var(--ouro), 0 8px 48px rgba(255,215,0,0.7); }
+  }
+
+  /* Cards da linha do tempo */
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    align-items: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  .timeline-item:nth-child(odd) .tl-card { grid-column: 1; text-align: right; }
+  .timeline-item:nth-child(odd) .tl-empty { grid-column: 3; }
+  .timeline-item:nth-child(even) .tl-card { grid-column: 3; text-align: left; }
+  .timeline-item:nth-child(even) .tl-empty { grid-column: 1; }
+
+  .tl-center {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 5;
+  }
+
+  .tl-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--ouro);
+    border: 3px solid var(--verde-campo);
+    box-shadow: 0 0 0 3px var(--ouro);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+
+  .timeline-item:hover .tl-dot {
+    transform: scale(1.5);
+  }
+
+  .tl-card {
+    background: rgba(0,0,0,0.65);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 1.2rem 1.5rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tl-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,215,0,0.04), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tl-card:hover {
+    border-color: var(--ouro);
+    transform: scale(1.03);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+
+  .tl-card:hover::before { opacity: 1; }
+
+  .tl-year {
+    font-family: var(--bebas);
+    font-size: 2rem;
+    color: var(--ouro);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .tl-host {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .tl-champion {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--branco);
+    margin-bottom: 4px;
+  }
+
+  .tl-vice {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .tl-badge {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: rgba(255,215,0,0.15);
+    color: var(--ouro);
+    border: 1px solid rgba(255,215,0,0.3);
+  }
+
+  /* =====================================================
+     ===== NOVA SEÇÃO: CURIOSIDADES =====
+     ===================================================== */
+  #curiosidades-section {
+    position: relative;
+    z-index: 1;
+    padding: 80px 0;
+  }
+
+  .curiosidades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .curiosidade-card {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+    cursor: default;
+  }
+
+  .curiosidade-card:hover {
+    border-color: var(--ouro);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  }
+
+  .curiosidade-card::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .curio-number {
+    font-family: var(--bebas);
+    font-size: 4rem;
+    color: rgba(255,215,0,0.12);
+    line-height: 1;
+    position: absolute;
+    top: 0.5rem; right: 1rem;
+    letter-spacing: -2px;
+    pointer-events: none;
+  }
+
+  .curio-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .curio-title {
+    font-family: var(--bebas);
+    font-size: 1.3rem;
+    letter-spacing: 1.5px;
+    color: var(--ouro);
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+  }
+
+  .curio-text {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.7;
+  }
+
+  .curio-text strong {
+    color: var(--branco);
+    font-weight: 700;
+  }
+
+  .curio-tag {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* Curiosidade destaque (tamanho 2x) */
+  .curiosidade-card.destaque {
+    grid-column: span 2;
+  }
+  @media (max-width: 700px) {
+    .curiosidade-card.destaque { grid-column: span 1; }
+  }
+
+  /* =====================================================
+     ===== NOVA SEÇÃO: QUIZ =====
+     ===================================================== */
+  #quiz-section {
+    position: relative;
+    z-index: 1;
+    padding: 80px 0;
+  }
+
+  .quiz-container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .quiz-card {
+    background: rgba(0,0,0,0.7);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 24px;
+    padding: 2.5rem;
+    backdrop-filter: blur(16px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quiz-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 40px);
+    pointer-events: none;
+  }
+
+  .quiz-progress-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .quiz-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ouro-escuro), var(--ouro));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .quiz-q-num {
+    font-family: var(--bebas);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: var(--ouro);
+  }
+
+  .quiz-score-badge {
+    background: rgba(255,215,0,0.12);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-family: var(--bebas);
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: var(--ouro);
+  }
+
+  .quiz-category-badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 20px;
+    color: var(--preto);
+    font-family: var(--bebas);
+  }
+
+  .quiz-question {
+    font-family: var(--bebas);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    letter-spacing: 1px;
+    color: var(--branco);
+    line-height: 1.2;
+    margin-bottom: 2rem;
+    min-height: 3.5rem;
+  }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .quiz-option {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quiz-option:hover:not(.answered) {
+    border-color: var(--ouro);
+    background: rgba(255,215,0,0.08);
+    color: var(--branco);
+    transform: scale(1.02);
+  }
+
+  .quiz-option .opt-letter {
+    font-family: var(--bebas);
+    font-size: 1.1rem;
+    color: var(--ouro);
+    min-width: 24px;
+    letter-spacing: 1px;
+  }
+
+  .quiz-option.correct {
+    border-color: #4CAF50;
+    background: rgba(76,175,80,0.15);
+    color: #fff;
+    animation: correctPop 0.4s ease;
+  }
+
+  @keyframes correctPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .quiz-option.wrong {
+    border-color: #f44336;
+    background: rgba(244,67,54,0.15);
+    color: rgba(255,255,255,0.6);
+  }
+
+  .quiz-option.correct .opt-letter { color: #4CAF50; }
+  .quiz-option.wrong .opt-letter { color: #f44336; }
+
+  .quiz-feedback {
+    background: rgba(255,215,0,0.06);
+    border-left: 4px solid var(--ouro);
+    border-radius: 0 12px 12px 0;
+    padding: 1rem 1.25rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback strong { color: var(--ouro); }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .quiz-next-btn {
+    background: var(--ouro);
+    color: var(--preto);
+    font-family: var(--bebas);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: none;
+  }
+
+  .quiz-next-btn:hover { background: var(--ouro-escuro); transform: scale(1.05); }
+  .quiz-next-btn.show { display: block; }
+
+  /* Resultado final */
+  .quiz-result {
+    text-align: center;
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .quiz-result.show { display: block; }
+
+  .quiz-result-ball {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: ballBounce 1s ease-in-out infinite;
+  }
+
+  .quiz-result-score {
+    font-family: var(--bebas);
+    font-size: 5rem;
+    color: var(--ouro);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    letter-spacing: 4px;
+  }
+
+  .quiz-result-label {
+    font-family: var(--bebas);
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--branco);
+    margin-bottom: 0.5rem;
+  }
+
+  .quiz-result-msg {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 1rem auto 2rem;
+  }
+
+  .quiz-trophy {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 1.5rem;
+  }
+
+  .quiz-stars {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+  }
+
+  /* Timer */
+  .quiz-timer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--bebas);
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+  }
+
+  .quiz-timer.urgent { color: #f44336; animation: pulse 0.5s infinite; }
+
+  @media (max-width: 600px) {
+    .quiz-options { grid-template-columns: 1fr; }
+    .timeline-item { grid-template-columns: 1fr 40px 1fr; }
+    .tl-card { padding: 0.8rem 1rem; }
+    .tl-year { font-size: 1.4rem; }
+    .match-card { grid-template-columns: 1fr; gap: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CAMPO FUNDO -->
+<div class="field-bg">
+  <div class="field-stripes"></div>
+  <div class="field-center-line"></div>
+  <div class="field-center-circle"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⚽ Copa 2026</div>
+  <ul class="nav-links">
+    <li><a href="#programacao">Programação</a></li>
+    <li><a href="#timeline">⏳ Timeline</a></li>
+    <li><a href="#copa2026">Copa 2026</a></li>
+    <li><a href="#lendas">Lendas</a></li>
+    <li><a href="#curiosidades">💡 Curiosidades</a></li>
+    <li><a href="#videos">Vídeos</a></li>
+    <li><a href="#recordes">Recordes</a></li>
+    <li><a href="#quiz">🎯 Quiz</a></li>
+
+  </ul>
+</nav>
+
+<div class="site-content">
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="inicio">
+  <div class="goal-top">
+    <div class="crossbar">
+      <div class="net"></div>
+      <div class="post-left"></div>
+      <div class="post-right"></div>
+    </div>
+  </div>
+
+  <div class="hero-badge">🏆 FIFA World Cup · 11 Jun — 19 Jul 2026</div>
+  <h1>Copa do<span>Mundo</span></h1>
+  <p class="hero-sub">EUA · Canadá · México — O Maior Espetáculo do Futebol</p>
+
+  <div class="countdown" id="countdown">
+    <div class="cd-box"><span class="cd-num" id="cd-days">--</span><span class="cd-label">Dias</span></div>
+    <div class="cd-box"><span class="cd-num" id="cd-hours">--</span><span class="cd-label">Horas</span></div>
+    <div class="cd-box"><span class="cd-num" id="cd-mins">--</span><span class="cd-label">Min</span></div>
+    <div class="cd-box"><span class="cd-num" id="cd-secs">--</span><span class="cd-label">Seg</span></div>
+  </div>
+
+  <div class="hero-ctas">
+    <a href="#programacao" class="btn-primary">📅 Ver Programação</a>
+    <a href="#quiz" class="btn-primary" style="background:transparent;border:2px solid var(--ouro);color:var(--ouro);">🎯 Fazer o Quiz</a>
+  
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div style="position:relative;z-index:1;padding:0 2rem;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="stats-bar reveal">
+      <div class="stat-item"><span class="stat-num">48</span><span class="stat-lbl">Seleções</span></div>
+      <div class="stat-item"><span class="stat-num">104</span><span class="stat-lbl">Jogos</span></div>
+      <div class="stat-item"><span class="stat-num">16</span><span class="stat-lbl">Estádios</span></div>
+      <div class="stat-item"><span class="stat-num">3</span><span class="stat-lbl">Países</span></div>
+      <div class="stat-item"><span class="stat-num">2.271</span><span class="stat-lbl">Gols até 2022</span></div>
+      <div class="stat-item"><span class="stat-num">21</span><span class="stat-lbl">Edições</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROGRAMAÇÃO ===== -->
+<section class="section-glass" id="programacao">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">📅 Agenda Oficial</div>
+      <h2 class="section-title">Programação — Copa 2026</h2>
+      <p class="section-desc">Jogos, horários e onde assistir.</p>
+    </div>
+    <div class="schedule-grid" id="schedule-container"></div>
+    <div style="text-align:center;margin-top:1.5rem;">
+      <button class="btn-primary" onclick="openAddLinkModal('schedule')">+ Adicionar Jogo / Link</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     ===== NOVA SEÇÃO: LINHA DO TEMPO COM BOLA =====
+     ====================================================== -->
+<section id="timeline-section" id="timeline">
+  <div class="timeline-wrapper">
+    <div class="section-header reveal" style="margin-bottom:3rem;">
+      <div class="section-tag">⏳ Linha do Tempo</div>
+      <h2 class="section-title">A Jornada da Copa</h2>
+      <p class="section-desc">Percorra a história completa da Copa do Mundo — de 1930 a 2026 — com a bola guiando o caminho.</p>
+    </div>
+
+    <div class="timeline-track" id="timeline-track">
+      <div class="timeline-line"></div>
+      <!-- Bola sticky -->
+      <div class="timeline-ball">
+        <div class="timeline-ball-icon">⚽</div>
+      </div>
+      <!-- Items gerados por JS -->
+      <div id="timeline-items"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COPA 2026 ===== -->
+<section class="section-glass" id="copa2026">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">🌎 Edição 2026</div>
+      <h2 class="section-title">Copa do Mundo 2026</h2>
+      <p class="section-desc">A maior Copa da história — 48 seleções em 3 países, 104 jogos.</p>
+    </div>
+    <div class="section-header" style="margin-top:3rem;margin-bottom:1.5rem;">
+      <h3 style="font-family:var(--bebas);font-size:1.8rem;letter-spacing:2px;color:var(--ouro);">🏆 Maiores Potências</h3>
+    </div>
+    <div class="teams-grid" id="teams-grid"></div>
+    <div class="section-header" style="margin-top:3rem;margin-bottom:1.5rem;">
+      <h3 style="font-family:var(--bebas);font-size:1.8rem;letter-spacing:2px;color:var(--ouro);">🏟️ Estádios Sede</h3>
+    </div>
+    <div class="stadiums-grid" id="stadiums-grid"></div>
+  </div>
+</section>
+
+<!-- ===== LENDAS ===== -->
+<section style="position:relative;z-index:1;padding:80px 0;" id="lendas">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">⭐ Figurinhas</div>
+      <h2 class="section-title">Jogadores Lendários</h2>
+      <p class="section-desc">Clique na figurinha para ver as estatísticas completas no estilo eFootball.</p>
+    </div>
+    <div class="videos-filter" style="margin-bottom:2rem;">
+      <button class="filter-btn active" onclick="filterPlayers('all', this)">Todos</button>
+      <button class="filter-btn" onclick="filterPlayers('lenda', this)">🏆 Lenda</button>
+      <button class="filter-btn" onclick="filterPlayers('ouro', this)">⭐ Ouro</button>
+      <button class="filter-btn" onclick="filterPlayers('prata', this)">🥈 Prata</button>
+    </div>
+    <div class="cards-grid" id="players-grid"></div>
+  </div>
+</section>
+
+<!-- Modal jogador -->
+<div class="card-detail-overlay" id="player-modal">
+  <div class="card-detail-modal">
+    <button class="modal-close" onclick="closePlayerModal()">✕</button>
+    <div class="modal-header">
+      <div class="modal-avatar-placeholder" id="modal-init">?</div>
+      <div>
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-country" id="modal-country"></div>
+        <div class="modal-era" id="modal-era"></div>
+      </div>
+    </div>
+    <div class="stats-bars" id="modal-stats"></div>
+    <div class="modal-quote" id="modal-quote"></div>
+    <div class="modal-achievements" id="modal-achievements"></div>
+  </div>
+</div>
+
+<!-- ======================================================
+     ===== NOVA SEÇÃO: CURIOSIDADES =====
+     ====================================================== -->
+<section class="section-glass" id="curiosidades">
+  <div style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+    <div class="section-header reveal" style="margin-bottom:2.5rem;">
+      <div class="section-tag">💡 Sabia Que…?</div>
+      <h2 class="section-title">Curiosidades da Copa</h2>
+      <p class="section-desc">Fatos incríveis, histórias surpreendentes e momentos únicos que moldaram o maior torneio do mundo.</p>
+    </div>
+  </div>
+  <div class="curiosidades-grid" id="curiosidades-grid"></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===== VÍDEOS ===== -->
+<section style="position:relative;z-index:1;padding:80px 0;" id="videos">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">🎬 Momentos Históricos</div>
+      <h2 class="section-title">Vídeos & Momentos</h2>
+      <p class="section-desc">Os momentos mais marcantes da história da Copa.</p>
+    </div>
+    <div class="videos-filter">
+      <button class="filter-btn active" onclick="filterVideos('all', this)">Todos</button>
+      <button class="filter-btn" onclick="filterVideos('goal', this)">⚽ Gols Lendários</button>
+      <button class="filter-btn" onclick="filterVideos('final', this)">🏆 Finais Épicas</button>
+      <button class="filter-btn" onclick="filterVideos('moment', this)">⭐ Momentos</button>
+    </div>
+    <div class="videos-grid" id="videos-grid"></div>
+    <div style="text-align:center;margin-top:2rem;">
+      <button class="btn-primary" onclick="openAddVideoModal()">+ Adicionar Vídeo ou Link</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RECORDES ===== -->
+<section class="section-glass" id="recordes">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">📊 Estatísticas</div>
+      <h2 class="section-title">Recordes Históricos</h2>
+      <p class="section-desc">Os números mais impressionantes da história da Copa do Mundo.</p>
+    </div>
+    <div class="records-grid" id="records-grid"></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ======================================================
+     ===== NOVA SEÇÃO: QUIZ =====
+     ====================================================== -->
+<section id="quiz-section" id="quiz">
+  <div style="position:relative;z-index:1;padding:80px 0;" id="quiz">
+    <div class="section-header reveal" style="max-width:800px;margin:0 auto 2.5rem;padding:0 2rem;">
+      <div class="section-tag">🎯 Teste seus Conhecimentos</div>
+      <h2 class="section-title">Quiz da Copa do Mundo</h2>
+      <p class="section-desc">10 perguntas sobre a história da Copa. Você consegue acertar todas?</p>
+    </div>
+
+    <div class="quiz-container">
+      <div class="quiz-card" id="quiz-card">
+        <!-- Tela inicial -->
+        <div id="quiz-start-screen" style="text-align:center;padding:1rem 0;">
+          <div style="font-size:5rem;margin-bottom:1rem;">⚽</div>
+          <div style="font-family:var(--bebas);font-size:2.5rem;letter-spacing:3px;color:var(--ouro);margin-bottom:0.75rem;">QUIZ DA COPA</div>
+          <p style="color:rgba(255,255,255,0.65);font-size:0.95rem;line-height:1.7;max-width:400px;margin:0 auto 2rem;">
+            10 perguntas sobre história, recordes, gols e momentos épicos da Copa do Mundo. Cada acerto vale 10 pontos!
+          </p>
+          <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;">
+            <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:0.75rem 1.5rem;text-align:center;">
+              <div style="font-family:var(--bebas);font-size:1.5rem;color:var(--ouro);">10</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;font-weight:700;">Perguntas</div>
+            </div>
+            <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:0.75rem 1.5rem;text-align:center;">
+              <div style="font-family:var(--bebas);font-size:1.5rem;color:var(--ouro);">20s</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;font-weight:700;">Por Pergunta</div>
+            </div>
+            <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:0.75rem 1.5rem;text-align:center;">
+              <div style="font-family:var(--bebas);font-size:1.5rem;color:var(--ouro);">100</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;font-weight:700;">Pts Máximos</div>
+            </div>
+          </div>
+          <button class="game-start-btn" onclick="startQuiz()">🚀 INICIAR QUIZ</button>
+        </div>
+
+        <!-- Tela de jogo -->
+        <div id="quiz-game-screen" style="display:none;">
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="quiz-progress" style="width:0%"></div>
+          </div>
+          <div class="quiz-meta">
+            <div class="quiz-q-num" id="quiz-q-num">Pergunta 1 de 10</div>
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+              <div class="quiz-timer" id="quiz-timer">⏱️ 20</div>
+              <div class="quiz-score-badge" id="quiz-score-badge">0 pts</div>
+            </div>
+          </div>
+          <div id="quiz-category-label" style="margin-bottom:1rem;"></div>
+          <div class="quiz-question" id="quiz-question">Carregando pergunta...</div>
+          <div class="quiz-options" id="quiz-options"></div>
+          <div class="quiz-feedback" id="quiz-feedback"></div>
+          <div class="quiz-nav">
+            <div></div>
+            <button class="quiz-next-btn" id="quiz-next-btn" onclick="nextQuestion()">Próxima →</button>
+          </div>
+        </div>
+
+        <!-- Tela de resultado -->
+        <div class="quiz-result" id="quiz-result-screen">
+          <div class="quiz-result-ball">⚽</div>
+          <div class="quiz-stars" id="quiz-stars"></div>
+          <div class="quiz-result-score" id="quiz-result-score">100</div>
+          <div class="quiz-result-label" id="quiz-result-label">PONTOS</div>
+          <div class="quiz-trophy" id="quiz-result-trophy">🏆</div>
+          <div class="quiz-result-msg" id="quiz-result-msg">Parabéns!</div>
+          <button class="game-start-btn" onclick="restartQuiz()">🔄 JOGAR NOVAMENTE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- FOOTER -->
+<div class="footer-goal" style="position:relative;z-index:1;padding-bottom:0;">
+  <div class="goal-bottom">
+    <div class="field-area"></div>
+    <div class="crossbar-b" style="position:relative;">
+      <div class="net-b"></div>
+      <div class="post-left-b"></div>
+      <div class="post-right-b"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">⚽ Copa 2026</span>
+  <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;">O Portal Interativo do Maior Espetáculo do Futebol</p>
+  <div class="footer-links">
+    <a href="#programacao">Programação</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#copa2026">Copa 2026</a>
+    <a href="#lendas">Lendas</a>
+    <a href="#curiosidades">Curiosidades</a>
+    <a href="#videos">Vídeos</a>
+    <a href="#recordes">Recordes</a>
+    <a href="#quiz">Quiz</a>
+
+  </div>
+  <p class="footer-copy">Dados: FIFA.com · Transfermarkt · ESPN Stats · Wikipedia<br>©️ 2026 Portal Copa do Mundo — Conteúdo informativo e educativo</p>
+</footer>
+
+</div><!-- end site-content -->
+
+<!-- Modals -->
+<div class="add-modal" id="add-video-modal">
+  <div class="add-modal-inner">
+    <button class="modal-close" onclick="closeAddVideoModal()" style="position:absolute;top:1rem;right:1rem;">✕</button>
+    <h3>➕ Adicionar Vídeo / Link</h3>
+    <label>Título</label><input type="text" id="add-title" placeholder="Ex: Gol de Pelé em 1958">
+    <label>URL do YouTube ou Link</label><input type="text" id="add-url" placeholder="https://youtube.com/watch?v=...">
+    <label>Ano</label><input type="text" id="add-year" placeholder="1986">
+    <label>Categoria</label>
+    <select id="add-category">
+      <option value="goal">⚽ Gol Lendário</option>
+      <option value="final">🏆 Final Épica</option>
+      <option value="moment">⭐ Momento Histórico</option>
+    </select>
+    <label>Descrição curta</label><input type="text" id="add-desc" placeholder="Descrição breve do momento">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeAddVideoModal()">Cancelar</button>
+      <button class="modal-confirm" onclick="addVideo()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<div class="add-modal" id="add-link-modal">
+  <div class="add-modal-inner">
+    <button class="modal-close" onclick="closeAddLinkModal()" style="position:absolute;top:1rem;right:1rem;">✕</button>
+    <h3>📺 Adicionar Link de Transmissão</h3>
+    <label>Nome do Canal / Plataforma</label><input type="text" id="link-name" placeholder="Ex: SporTV, Globoplay, FIFA+">
+    <label>URL</label><input type="text" id="link-url" placeholder="https://...">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeAddLinkModal()">Cancelar</button>
+      <button class="modal-confirm" onclick="addLink()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DADOS =====
+const historyData = [
+  {year:1930,champion:'🇺🇾 Uruguai',host:'Uruguai',vice:'Argentina',note:'1ª Copa da história'},
+  {year:1934,champion:'🇮🇹 Itália',host:'Itália',vice:'Tchecoslováquia',note:'Mussolini pressiona árbitros'},
+  {year:1938,champion:'🇮🇹 Itália',host:'França',vice:'Hungria',note:'Último antes da guerra'},
+  {year:1950,champion:'🇺🇾 Uruguai',host:'Brasil',vice:'Brasil',note:'Maracanazo — 200mil'},
+  {year:1954,champion:'🇩🇪 Alemanha',host:'Suíça',vice:'Hungria',note:'Milagre de Berna'},
+  {year:1958,champion:'🇧🇷 Brasil',host:'Suécia',vice:'Suécia',note:'Pelé com 17 anos'},
+  {year:1962,champion:'🇧🇷 Brasil',host:'Chile',vice:'Tchecoslováquia',note:'Garrincha brilha'},
+  {year:1966,champion:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra',host:'Inglaterra',vice:'Alemanha',note:'Único título da Inglaterra'},
+  {year:1970,champion:'🇧🇷 Brasil',host:'México',vice:'Itália',note:'O Brasil da Copa do Mundo Perfeita'},
+  {year:1974,champion:'🇩🇪 Alemanha',host:'Alemanha',vice:'Holanda',note:'Laranja Mecânica de Cruyff'},
+  {year:1978,champion:'🇦🇷 Argentina',host:'Argentina',vice:'Holanda',note:'Argentina em casa'},
+  {year:1982,champion:'🇮🇹 Itália',host:'Espanha',vice:'Alemanha',note:'Paolo Rossi ressurge'},
+  {year:1986,champion:'🇦🇷 Argentina',host:'México',vice:'Alemanha',note:'Maradona — Gol do Século'},
+  {year:1990,champion:'🇩🇪 Alemanha',host:'Itália',vice:'Argentina',note:'Copa mais defensiva'},
+  {year:1994,champion:'🇧🇷 Brasil',host:'EUA',vice:'Itália',note:'Tetra! Romário & Bebeto'},
+  {year:1998,champion:'🇫🇷 França',host:'França',vice:'Brasil',note:'Zidane brilha em casa'},
+  {year:2002,champion:'🇧🇷 Brasil',host:'Coreia/Japão',vice:'Alemanha',note:'Ronaldo ressurge — Penta!'},
+  {year:2006,champion:'🇮🇹 Itália',host:'Alemanha',vice:'França',note:'Zidane — Cabeçada final'},
+  {year:2010,champion:'🇪🇸 Espanha',host:'África do Sul',vice:'Holanda',note:'Tiki-taka de Iniesta'},
+  {year:2014,champion:'🇩🇪 Alemanha',host:'Brasil',vice:'Argentina',note:'7×1 — Mineirazo'},
+  {year:2018,champion:'🇫🇷 França',host:'Rússia',vice:'Croácia',note:'Mbappé detona'},
+  {year:2022,champion:'🇦🇷 Argentina',host:'Catar',vice:'França',note:'Messi conquista o troféu'},
+];
+
+const teamsData = [
+  {flag:'🇧🇷',name:'Brasil',titles:5,vice:2,years:'1958, 1962, 1970, 1994, 2002',desc:'O jogo bonito, habilidade e ginga'},
+  {flag:'🇩🇪',name:'Alemanha',titles:4,vice:4,years:'1954, 1974, 1990, 2014',desc:'Eficiência, organização e garra'},
+  {flag:'🇮🇹',name:'Itália',titles:4,vice:2,years:'1934, 1938, 1982, 2006',desc:'Defesa sólida e contra-ataque'},
+  {flag:'🇦🇷',name:'Argentina',titles:3,vice:3,years:'1978, 1986, 2022',desc:'Talento individual e garra'},
+  {flag:'🇫🇷',name:'França',titles:2,vice:2,years:'1998, 2018',desc:'Geração Mbappé, atletismo e técnica'},
+  {flag:'🇺🇾',name:'Uruguai',titles:2,vice:0,years:'1930, 1950',desc:'Garra charrúa, combatividade'},
+  {flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',name:'Inglaterra',titles:1,vice:0,years:'1966',desc:'Futebol físico e direto'},
+  {flag:'🇪🇸',name:'Espanha',titles:1,vice:0,years:'2010',desc:'Tiki-taka, posse de bola'},
+];
+
+const stadiumsData = [
+  {emoji:'🏟️',name:'MetLife Stadium',city:'Nova York / NJ',cap:'82.500',country:'🇺🇸',note:'Final da Copa 2026'},
+  {emoji:'🏟️',name:'AT&T Stadium',city:'Dallas',cap:'80.000',country:'🇺🇸',note:'Teto retrátil'},
+  {emoji:'🏟️',name:'Estádio Azteca',city:'Cidade do México',cap:'87.000',country:'🇲🇽',note:'Histórico — 1970 e 1986'},
+  {emoji:'🏟️',name:'SoFi Stadium',city:'Los Angeles',cap:'70.240',country:'🇺🇸',note:'Semifinal'},
+  {emoji:'🏟️',name:'Mercedes-Benz Stadium',city:'Atlanta',cap:'71.000',country:'🇺🇸',note:'Maior capacidade'},
+  {emoji:'🏟️',name:'Hard Rock Stadium',city:'Miami',cap:'65.000',country:'🇺🇸',note:'Calor tropical'},
+  {emoji:'🏟️',name:'Arrowhead Stadium',city:'Kansas City',cap:'76.416',country:'🇺🇸',note:'Torcida barulhenta'},
+  {emoji:'🏟️',name:'BMO Field',city:'Toronto',cap:'45.000',country:'🇨🇦',note:'1º jogo no Canadá'},
+  {emoji:'🏟️',name:'BC Place',city:'Vancouver',cap:'54.500',country:'🇨🇦',note:'Teto retrátil'},
+  {emoji:'🏟️',name:'Estadio BBVA',city:'Monterrey',cap:'53.500',country:'🇲🇽',note:'Moderno'},
+];
+
+const playersData = [
+  {name:'Pelé',country:'🇧🇷 Brasil',era:'1958 — 1970',rarity:'lenda',overall:99,pos:'ATA',initials:'PE',stats:{vel:95,fin:99,pas:92,dri:98,def:40,fis:88},goals:12,cups:3,quote:'Único jogador a vencer 3 Copas do Mundo. Estreou com 17 anos em 1958.',achievements:['3x Campeão Mundial','Artilheiro histórico','Rei do Futebol']},
+  {name:'Maradona',country:'🇦🇷 Argentina',era:'1982 — 1994',rarity:'lenda',overall:98,pos:'MEI',initials:'MA',stats:{vel:92,fin:95,pas:96,dri:99,def:45,fis:82},goals:8,cups:1,quote:'Gol do Século e Mão de Deus em 1986. Liderou Argentina ao título sozinho.',achievements:['Campeão 1986','Gol do Século','Bola de Ouro 1986']},
+  {name:'Ronaldo Fenômeno',country:'🇧🇷 Brasil',era:'1994 — 2006',rarity:'lenda',overall:97,pos:'ATA',initials:'RF',stats:{vel:98,fin:99,pas:82,dri:96,def:35,fis:94},goals:15,cups:2,quote:'Artilheiro histórico com 15 gols. Voltou de lesões para ser campeão em 2002.',achievements:['2x Campeão Mundial','15 gols — recorde','2x Bola de Ouro FIFA']},
+  {name:'Lionel Messi',country:'🇦🇷 Argentina',era:'2006 — 2022',rarity:'lenda',overall:98,pos:'ATA',initials:'LM',stats:{vel:91,fin:97,pas:98,dri:99,def:38,fis:78},goals:13,cups:1,quote:'Campeão em 2022 após pênaltis épicos contra a França. 5 Copas disputadas.',achievements:['Campeão 2022','GOAT','8x Bola de Ouro']},
+  {name:'Kylian Mbappé',country:'🇫🇷 França',era:'2018 — Presente',rarity:'ouro',overall:95,pos:'ATA',initials:'KM',stats:{vel:99,fin:94,pas:82,dri:92,def:36,fis:85},goals:12,cups:1,quote:'Hat-trick na Final de 2022. O mais rápido do mundo, favorito para 2026.',achievements:['Campeão 2018','Hat-trick Final 2022','O mais rápido']},
+  {name:'Vinicius Jr.',country:'🇧🇷 Brasil',era:'2022 — Presente',rarity:'ouro',overall:92,pos:'ATA',initials:'VJ',stats:{vel:97,fin:88,pas:80,dri:95,def:32,fis:82},goals:3,cups:0,quote:'Bola de Ouro 2024. Esperança do Brasil para conquistar o hexacampeonato.',achievements:['Bola de Ouro 2024','Champions 2024','Esperança do Hexa']},
+  {name:'Lamine Yamal',country:'🇪🇸 Espanha',era:'2024 — Presente',rarity:'prata',overall:89,pos:'PD',initials:'LY',stats:{vel:92,fin:82,pas:88,dri:94,def:30,fis:70},goals:1,cups:0,quote:'Campeão da Euro 2024 com 17 anos. Recorde do jogador mais jovem da história.',achievements:['Campeão Euro 2024','Revelação 2024','Prodígio da Espanha']},
+  {name:'Jude Bellingham',country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra',era:'2022 — Presente',rarity:'ouro',overall:91,pos:'MEI',initials:'JB',stats:{vel:85,fin:86,pas:88,dri:87,def:78,fis:90},goals:4,cups:0,quote:'Versátil e completo. Liderança na Euro 2024. Candidato a melhor do mundo em 2026.',achievements:['Liga dos Campeões 2024','Ballon d\'Or candidato','Melhor da Premier League']},
+  {name:'Neymar Jr.',country:'🇧🇷 Brasil',era:'2010 — 2022',rarity:'lenda',overall:96,pos:'ATA',initials:'NE',stats:{vel:94,fin:91,pas:93,dri:99,def:38,fis:80},goals:8,cups:0,quote:'Artista do drible e criatividade. Liderou o Brasil em 3 Copas. Talento único.',achievements:['3x Copa América','Champions 2015','Melhor do Brasil na era']},
+  {name:'Cristiano Ronaldo',country:'🇵🇹 Portugal',era:'2006 — 2022',rarity:'lenda',overall:97,pos:'ATA',initials:'CR',stats:{vel:89,fin:98,pas:84,dri:92,def:35,fis:95},goals:8,cups:0,quote:'Cinco Copas disputadas. Liderou Portugal à semifinal de 2006. Dedicação lendária.',achievements:['Euro 2016','Nations League 2019','5x Bola de Ouro']},
+];
+
+let videosData = [
+  {id:'v1',title:'Gol do Século — Maradona vs Inglaterra',year:1986,cat:'goal',desc:'O maior gol da história da Copa do Mundo. Maradona dribla 5 jogadores ingleses.',url:'https://www.youtube.com/watch?v=GbmAFBcZsgI'},
+  {id:'v2',title:'Alemanha 7×1 Brasil — Semifinal 2014',year:2014,cat:'moment',desc:'O maior vexame da história do futebol brasileiro. Sete gols sofridos em casa.',url:'https://www.youtube.com/watch?v=OiSMBHpJNiE'},
+  {id:'v3',title:'Final 2022 — Argentina × França (Pênaltis)',year:2022,cat:'final',desc:'A maior final da história. Messi ergue a taça após dramáticos pênaltis.',url:'https://www.youtube.com/watch?v=1Bh6BsHJnOA'},
+  {id:'v4',title:'Pelé — Primeiro Gol na Copa 1958',year:1958,cat:'goal',desc:'Com 17 anos, Pelé marca na semifinal contra o País de Gales e entra para a história.',url:'https://www.youtube.com/watch?v=CKnRKHNpqBs'},
+  {id:'v5',title:'Maracanazo — Uruguai 2×1 Brasil (1950)',year:1950,cat:'moment',desc:'O maior choque da história. Uruguai vence o Brasil no Maracanã com 200.000 torcedores.',url:'https://www.youtube.com/watch?v=SLRiMVFJFOA'},
+  {id:'v6',title:'Hat-trick de Mbappé na Final 2022',year:2022,cat:'goal',desc:'Mbappé marca três gols na final — o segundo hat-trick em finais da história.',url:'https://www.youtube.com/watch?v=BXhpNMVGCHQ'},
+];
+
+const recordsData = [
+  {icon:'⚽',value:'16 Gols',name:'Maior Artilheiro',desc:'Miroslav Klose (Alemanha) — 4 Copas disputadas'},
+  {icon:'🏆',value:'10×1',name:'Maior Vitória',desc:'Hungria × El Salvador — Copa de 1982'},
+  {icon:'⭐',value:'17 Anos',name:'Mais Jovem a Marcar',desc:'Pelé (Brasil) — Copa 1958, gol histórico'},
+  {icon:'👥',value:'199.854',name:'Maior Público',desc:'Brasil × Uruguai — Maracanã 1950'},
+  {icon:'📊',value:'2.271',name:'Total de Gols',desc:'856 jogos até 2022 — média de 2,65 gols/jogo'},
+  {icon:'🎯',value:'50+',name:'Hat-tricks',desc:'Mbappé foi o último — Final 2022 vs Argentina'},
+];
+
+let scheduleData = [
+  {date:'11 Jun',time:'17:00',group:'Abertura',teams:'México 🇲🇽 × EUA 🇺🇸',venue:'Azteca, Cidade do México',links:[{name:'SporTV',url:'https://sportv.globo.com'},{name:'Globo',url:'https://globoplay.globo.com'},{name:'FIFA+',url:'https://www.fifa.com/fifaplus'}]},
+  {date:'13 Jun',time:'12:00',group:'Grupo A',teams:'Brasil 🇧🇷 × Adversário',venue:'MetLife, Nova York',links:[{name:'SporTV',url:'https://sportv.globo.com'},{name:'Globo',url:'https://globoplay.globo.com'}]},
+  {date:'13 Jun',time:'15:00',group:'Grupo B',teams:'Argentina 🇦🇷 × Adversário',venue:'SoFi, Los Angeles',links:[{name:'SporTV',url:'https://sportv.globo.com'},{name:'ESPN',url:'https://espn.com.br'}]},
+  {date:'14 Jun',time:'18:00',group:'Grupo C',teams:'França 🇫🇷 × Adversário',venue:'AT&T, Dallas',links:[{name:'SporTV',url:'https://sportv.globo.com'},{name:'ESPN',url:'https://espn.com.br'}]},
+  {date:'19 Jul',time:'16:00',group:'FINAL',teams:'Final — TBD × TBD',venue:'MetLife, Nova York',links:[{name:'Globo',url:'https://globoplay.globo.com'},{name:'SporTV',url:'https://sportv.globo.com'},{name:'ESPN',url:'https://espn.com.br'},{name:'FIFA+',url:'https://www.fifa.com/fifaplus'}],isFinal:true},
+];
+
+// ===== CURIOSIDADES =====
+const curiosidadesData = [
+  {icon:'⚽',title:'A Mão de Deus',text:'Em 1986, Maradona marcou com a mão contra a Inglaterra e depois fingiu que foi com a cabeça. O árbitro aceitou e o gol valeu. A Argentina venceu 2×1 e se classificou. Maradona chamou de <strong>"um pouco a mão de Deus e um pouco a cabeça de Maradona"</strong>.',tag:'Argentina 1986'},
+  {icon:'🏆',title:'Brasil: Único 5x Campeão',text:'<strong>Brasil é o único país com 5 títulos mundiais</strong>, conquistados em 1958, 1962, 1970, 1994 e 2002. A seleção também é a única a ter participado de todas as edições da Copa do Mundo — 22 edições sem falhar uma sequer.',tag:'Recorde histórico',destaque:false},
+  {icon:'😢',title:'O Maracanazo que Parou o Brasil',text:'Em 1950, o Brasil precisava só de um empate contra o Uruguai na última rodada com <strong>200.000 torcedores no Maracanã</strong>. Perdeu 2×1. O silêncio após o gol do Uruguai foi descrito como o som mais triste já ouvido num estádio. O goleiro Barbosa carregou a culpa pelo resto da vida.',tag:'Brasil 1950'},
+  {icon:'🎯',title:'Pelé — O Menino Campeão',text:'Pelé tem <strong>17 anos, 249 dias</strong> quando marca na semifinal de 1958. É o jogador mais jovem a marcar em Copas do Mundo. Na mesma Copa, ele venceu o título e chorou no ombro do lateral Djalma Santos. A imagem virou símbolo do futebol.',tag:'Suécia 1958'},
+  {icon:'🇩🇪',title:'O Dia que o Brasil Ficou Sem Palavras',text:'Em 2014, a Alemanha marcou <strong>5 gols em 18 minutos</strong> contra o Brasil na semifinal. O placar final foi 7×1. O estádio Mineirão, com 60.000 torcedores brasileiros, ficou em silêncio. Foi o maior resultado contra o Brasil em Copas e um dos maiores da história.',tag:'Brasil 2014',destaque:true},
+  {icon:'🤝',title:'A Copa que Parou uma Guerra',text:'Em 1967, um acordo não oficial foi feito para que Nigeria e Biafra — em guerra civil — <strong>entrassem em cessar-fogo por 48 horas</strong> para assistir Pelé jogar uma amistosa. O futebol literalmente parou uma guerra.',tag:'Curiosidade'},
+  {icon:'🧤',title:'O Goleiro que Nunca Perdoou',text:'Moacyr Barbosa, goleiro do Brasil em 1950, foi culpado pela derrota para o Uruguai pelo resto da vida. Ele disse: <strong>"No Brasil, a pena máxima é 30 anos. Eu paguei pelo resto da vida por um crime que não cometi."</strong> Faleceu em 2000, ainda marcado pelo Maracanazo.',tag:'Tragédia'},
+  {icon:'🌍',title:'Copa 2026 — A Maior de Todos os Tempos',text:'A Copa de 2026 será a <strong>primeira com 48 seleções</strong> (antes eram 32), gerando 104 jogos em vez de 64. Será disputada em 3 países simultaneamente: EUA, Canadá e México. A final será no MetLife Stadium em Nova York, com capacidade para 82.500 pessoas.',tag:'Copa 2026'},
+  {icon:'🧠',title:'Ronaldo e a Convulsão Misteriosa',text:'Na véspera da final de 1998, Ronaldo sofreu uma convulsão e seu nome foi retirado da escalação. Horas depois, ele foi incluído de volta. O Brasil perdeu para a França por 3×0. Nunca se soube oficialmente o que causou a convulsão — um dos maiores mistérios do futebol.',tag:'França 1998'},
+  {icon:'🏅',title:'Klose — O Rei dos Gols',text:'Miroslav Klose marcou <strong>16 gols em 4 Copas do Mundo</strong> (1998–2014), o recorde absoluto. Ultrapassou Ronaldo com um gol contra o Brasil na semifinal de 2014 — aquela mesma semifinal do 7×1. Ironia ou destino? O futebol tem um senso de humor próprio.',tag:'Recordes'},
+  {icon:'⚡',title:'Mbappé — O Mais Rápido',text:'Kylian Mbappé atingiu <strong>38 km/h durante a Copa de 2018</strong>, tornando-se o jogador mais rápido já registrado em uma Copa do Mundo. Na final de 2022, marcou hat-trick em 97 minutos — mas a Argentina venceu nos pênaltis. Ele tem 27 anos e 2026 pode ser a sua Copa.',tag:'França'},
+];
+
+// ===== QUIZ =====
+const quizData = [
+  {
+    q:'Quem é o maior artilheiro da história das Copas do Mundo?',
+    opts:['Pelé','Ronaldo Fenômeno','Miroslav Klose','Gerd Müller'],
+    ans:2,cat:'📊 Recordes',
+    feedback:'<strong>Miroslav Klose</strong> marcou 16 gols em 4 Copas (2002–2014), superando Ronaldo (15) e Pelé (12). Seu último gol veio no 7×1 contra o Brasil.'
+  },
+  {
+    q:'Em qual Copa do Mundo o Brasil foi eliminado por 7×1?',
+    opts:['Copa 2010 na África do Sul','Copa 2018 na Rússia','Copa 2014 no Brasil','Copa 2006 na Alemanha'],
+    ans:2,cat:'📅 História',
+    feedback:'O histórico <strong>7×1 da Alemanha sobre o Brasil</strong> aconteceu na semifinal da Copa de 2014, que o Brasil sediou. O jogo ficou conhecido como "Mineirazo".'
+  },
+  {
+    q:'Quantos títulos mundiais o Brasil possui?',
+    opts:['4','5','6','3'],
+    ans:1,cat:'🏆 Títulos',
+    feedback:'<strong>Brasil tem 5 títulos</strong>: 1958 (Suécia), 1962 (Chile), 1970 (México), 1994 (EUA) e 2002 (Coreia/Japão). É o único pentacampeão mundial.'
+  },
+  {
+    q:'Qual foi o "Gol do Século" da Copa de 1986?',
+    opts:['Gol de bicicleta de Zico','Gol de Pelé contra a Itália','Gol de Maradona contra a Inglaterra','Gol de Ronaldo contra a Alemanha'],
+    ans:2,cat:'⚽ Gols',
+    feedback:'O gol de <strong>Maradona contra a Inglaterra</strong> em 1986 foi eleito o "Gol do Século" em votação da FIFA. Ele driblou 5 jogadores em 11 segundos percorrendo 60 metros.'
+  },
+  {
+    q:'Qual país foi campeão da Copa do Mundo 2022 no Catar?',
+    opts:['França','Croácia','Brasil','Argentina'],
+    ans:3,cat:'📅 Recente',
+    feedback:'<strong>Argentina</strong> venceu a França nos pênaltis na Copa de 2022. Messi finalmente conquistou o único título que lhe faltava, em uma das maiores finais da história.'
+  },
+  {
+    q:'Qual é a única seleção a ter participado de todas as Copas do Mundo?',
+    opts:['Alemanha','Brasil','Itália','Argentina'],
+    ans:1,cat:'🌍 Curiosidades',
+    feedback:'<strong>Brasil</strong> é a única seleção a ter disputado todas as 22 edições da Copa do Mundo, de 1930 até 2022. Nenhum outro país tem esse feito.'
+  },
+  {
+    q:'Com quantos anos Pelé ganhou sua primeira Copa do Mundo?',
+    opts:['16 anos','17 anos','18 anos','15 anos'],
+    ans:1,cat:'⭐ Lendas',
+    feedback:'<strong>Pelé tinha 17 anos e 249 dias</strong> quando o Brasil venceu a Copa de 1958 na Suécia. Ele também se tornou o jogador mais jovem a marcar em uma Copa.'
+  },
+  {
+    q:'Quem marcou hat-trick na Final da Copa do Mundo 2022?',
+    opts:['Lionel Messi','Lautaro Martínez','Kylian Mbappé','Antoine Griezmann'],
+    ans:2,cat:'⚽ Finais',
+    feedback:'<strong>Kylian Mbappé</strong> marcou três gols na final contra a Argentina (2-2 após 90min, 3-3 após prorrogação). Foi o segundo hat-trick em finais de Copa — o primeiro foi de Geoff Hurst em 1966.'
+  },
+  {
+    q:'Em que cidade será disputada a Final da Copa do Mundo 2026?',
+    opts:['Los Angeles','Dallas','Chicago','Nova York / Nova Jersey'],
+    ans:3,cat:'🌎 Copa 2026',
+    feedback:'A Final da Copa de 2026 será disputada no <strong>MetLife Stadium em Nova Jersey</strong> (área metropolitana de Nova York), com capacidade para 82.500 espectadores, em 19 de julho de 2026.'
+  },
+  {
+    q:'Qual seleção venceu a Copa do Mundo de 1950 causando o "Maracanazo"?',
+    opts:['Argentina','Paraguai','Uruguai','Chile'],
+    ans:2,cat:'📅 História',
+    feedback:'<strong>Uruguai</strong> venceu o Brasil por 2×1 no Maracanã com 200.000 torcedores brasileiros presentes. Foi o maior choque da história do futebol — o Brasil precisava apenas de um empate para ser campeão.'
+  },
+];
+
+// ===== CONTAGEM REGRESSIVA =====
+function updateCountdown() {
+  const target = new Date('2026-06-11T17:00:00-06:00');
+  const now = new Date();
+  const diff = target - now;
+  if(diff <= 0) {
+    document.getElementById('cd-days').textContent = '00';
+    document.getElementById('cd-hours').textContent = '00';
+    document.getElementById('cd-mins').textContent = '00';
+    document.getElementById('cd-secs').textContent = '00';
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = String(days).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(secs).padStart(2,'0');
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ===== PROGRAMAÇÃO =====
+function renderSchedule() {
+  const c = document.getElementById('schedule-container');
+  c.innerHTML = scheduleData.map((m,i) => `
+    <div class="match-card${m.isFinal?' final':''}">
+      <div class="match-date">
+        <div class="date">${m.date}</div>
+        <div class="time">${m.time} BRT</div>
+        <div class="match-badge">${m.group}</div>
+      </div>
+      <div>
+        <div class="match-teams">${m.teams}</div>
+        <div class="match-venue">📍 ${m.venue}</div>
+      </div>
+      <div class="match-links" id="links-${i}">
+        ${m.links.map(l=>`<a class="watch-btn" href="${l.url}" target="_blank">📺 ${l.name}</a>`).join('')}
+        <button class="add-link-btn" onclick="openAddLinkModal(${i})">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+let currentScheduleIdx = null;
+function openAddLinkModal(idx) {
+  currentScheduleIdx = idx;
+  document.getElementById('add-link-modal').classList.add('active');
+}
+function closeAddLinkModal() { document.getElementById('add-link-modal').classList.remove('active'); }
+function addLink() {
+  const name = document.getElementById('link-name').value.trim();
+  const url = document.getElementById('link-url').value.trim();
+  if(!name||!url) return;
+  if(currentScheduleIdx !== null && currentScheduleIdx !== 'schedule') {
+    scheduleData[currentScheduleIdx].links.push({name,url});
+  } else {
+    scheduleData.push({date:'?',time:'?',group:'Novo',teams:'Novo Jogo',venue:'Local',links:[{name,url}]});
+  }
+  renderSchedule();
+  closeAddLinkModal();
+  document.getElementById('link-name').value='';
+  document.getElementById('link-url').value='';
+}
+
+// ===== HISTÓRIA =====
+// ===== LINHA DO TEMPO =====
+function renderTimeline() {
+  const container = document.getElementById('timeline-items');
+  container.innerHTML = historyData.map((h,i) => `
+    <div class="timeline-item reveal" style="transition-delay:${i*0.04}s">
+      ${i%2===0 ? `
+        <div class="tl-card">
+          <div class="tl-year">${h.year}</div>
+          <div class="tl-host">Sede: ${h.host}</div>
+          <div class="tl-champion">${h.champion}</div>
+          <div class="tl-vice">Vice: ${h.vice}</div>
+          <span class="tl-badge">${h.note}</span>
+        </div>
+        <div class="tl-center"><div class="tl-dot"></div></div>
+        <div></div>
+      ` : `
+        <div></div>
+        <div class="tl-center"><div class="tl-dot"></div></div>
+        <div class="tl-card">
+          <div class="tl-year">${h.year}</div>
+          <div class="tl-host">Sede: ${h.host}</div>
+          <div class="tl-champion">${h.champion}</div>
+          <div class="tl-vice">Vice: ${h.vice}</div>
+          <span class="tl-badge">${h.note}</span>
+        </div>
+      `}
+    </div>
+  `).join('');
+}
+
+// ===== SELEÇÕES =====
+function renderTeams() {
+  const grid = document.getElementById('teams-grid');
+  grid.innerHTML = teamsData.map(t => `
+    <div class="team-card reveal">
+      <span class="team-flag">${t.flag}</span>
+      <div class="team-name">${t.name}</div>
+      <span class="team-titles">${t.titles}</span>
+      <div class="team-titles-lbl">Títulos Mundiais</div>
+      <div class="team-cups-row">${t.years.split(', ').map(y=>`<span class="year-chip">${y}</span>`).join('')}</div>
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:8px;">${t.desc}</div>
+    </div>
+  `).join('');
+}
+
+// ===== ESTÁDIOS =====
+function renderStadiums() {
+  const grid = document.getElementById('stadiums-grid');
+  grid.innerHTML = stadiumsData.map(s => `
+    <div class="stadium-card reveal">
+      <div class="stadium-icon">${s.emoji}</div>
+      <div>
+        <div class="stadium-name">${s.name}</div>
+        <div class="stadium-detail">${s.city} ${s.country}</div>
+        <div class="stadium-detail">${s.note}</div>
+        <div class="stadium-cap">👥 ${s.cap}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== FIGURINHAS =====
+function getStatColor(val) {
+  if(val>=90) return '#FFD700';
+  if(val>=75) return '#4CAF50';
+  if(val>=55) return '#2196F3';
+  return '#f44336';
+}
+
+let currentFilter = 'all';
+function renderPlayers(filter='all') {
+  currentFilter = filter;
+  const grid = document.getElementById('players-grid');
+  const filtered = filter==='all' ? playersData : playersData.filter(p=>p.rarity===filter);
+  grid.innerHTML = filtered.map((p,i) => {
+    const idx = playersData.indexOf(p);
+    return `
+    <div class="efootball-card card-${p.rarity}" onclick="openPlayerModal(${idx})">
+      <div class="card-inner">
+        <div class="card-shine"></div>
+        <div class="card-badge-rarity">${p.rarity.toUpperCase()}</div>
+        <div class="card-overall">${p.overall}</div>
+        <div class="card-pos-badge">${p.pos}</div>
+        <div class="card-player-avatar">${p.initials}</div>
+        <div class="card-info">
+          <div class="card-name">${p.name}</div>
+          <div class="card-country">${p.country}</div>
+          <div class="card-stats">
+            ${Object.entries(p.stats).slice(0,6).map(([k,v])=>`
+              <div class="card-stat">
+                <span class="stat-val" style="color:${getStatColor(v)}">${v}</span>
+                <span class="stat-key">${k.toUpperCase()}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterPlayers(f, btn) {
+  document.querySelectorAll('.videos-filter .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPlayers(f);
+}
+
+function openPlayerModal(idx) {
+  const p = playersData[idx];
+  document.getElementById('modal-init').textContent = p.initials;
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-country').textContent = p.country;
+  document.getElementById('modal-era').textContent = `⏱️ ${p.era} · ${p.goals} gols · ${p.cups} títulos`;
+  const statLabels = {vel:'Velocidade',fin:'Finalização',pas:'Passe',dri:'Drible',def:'Defesa',fis:'Físico'};
+  document.getElementById('modal-stats').innerHTML = Object.entries(p.stats).map(([k,v])=>`
+    <div class="stat-bar-row">
+      <div class="stat-bar-label">${statLabels[k]||k}</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${v}%;background:${getStatColor(v)}"></div></div>
+      <div class="stat-bar-num">${v}</div>
+    </div>
+  `).join('');
+  document.getElementById('modal-quote').textContent = p.quote;
+  document.getElementById('modal-achievements').innerHTML = p.achievements.map(a=>`<span class="achievement-pill">${a}</span>`).join('');
+  document.getElementById('player-modal').classList.add('active');
+}
+
+function closePlayerModal() { document.getElementById('player-modal').classList.remove('active'); }
+
+// ===== CURIOSIDADES =====
+function renderCuriosidades() {
+  const grid = document.getElementById('curiosidades-grid');
+  grid.innerHTML = curiosidadesData.map((c, i) => `
+    <div class="curiosidade-card reveal${c.destaque?' destaque':''}">
+      <div class="curio-number">${String(i+1).padStart(2,'0')}</div>
+      <span class="curio-icon">${c.icon}</span>
+      <div class="curio-title">${c.title}</div>
+      <div class="curio-text">${c.text}</div>
+      <span class="curio-tag">${c.tag}</span>
+    </div>
+  `).join('');
+}
+
+// ===== VÍDEOS =====
+let videoFilter = 'all';
+function renderVideos(filter='all') {
+  videoFilter = filter;
+  const grid = document.getElementById('videos-grid');
+  const filtered = filter==='all' ? videosData : videosData.filter(v=>v.cat===filter);
+  const catLabel = {goal:'Gol Lendário',final:'Final Épica',moment:'Momento'};
+  const catClass = {goal:'tag-goal',final:'tag-final',moment:'tag-moment'};
+  grid.innerHTML = filtered.map(v=>`
+    <div class="video-card">
+      <div class="video-thumb">
+        <div class="video-play-btn">▶</div>
+        <div class="video-year-tag">${v.year}</div>
+        <span class="video-type-tag ${catClass[v.cat]}">${catLabel[v.cat]}</span>
+      </div>
+      <div class="video-info">
+        <div class="video-title">${v.title}</div>
+        <div class="video-desc">${v.desc}</div>
+        <div class="video-actions">
+          <a class="video-link-btn" href="${v.url}" target="_blank">▶ Assistir</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterVideos(f, btn) {
+  document.querySelectorAll('#videos .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderVideos(f);
+}
+
+function openAddVideoModal() { document.getElementById('add-video-modal').classList.add('active'); }
+function closeAddVideoModal() { document.getElementById('add-video-modal').classList.remove('active'); }
+function addVideo() {
+  const title = document.getElementById('add-title').value.trim();
+  const url = document.getElementById('add-url').value.trim();
+  const year = parseInt(document.getElementById('add-year').value)||2026;
+  const cat = document.getElementById('add-category').value;
+  const desc = document.getElementById('add-desc').value.trim();
+  if(!title||!url) return;
+  videosData.unshift({id:'u'+Date.now(),title,url,year,cat,desc:desc||'Vídeo adicionado pelo usuário'});
+  renderVideos(videoFilter);
+  closeAddVideoModal();
+  ['add-title','add-url','add-year','add-desc'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ===== RECORDES =====
+function renderRecords() {
+  const grid = document.getElementById('records-grid');
+  grid.innerHTML = recordsData.map(r=>`
+    <div class="record-card reveal">
+      <span class="record-icon">${r.icon}</span>
+      <div class="record-value">${r.value}</div>
+      <div class="record-name">${r.name}</div>
+      <div class="record-desc">${r.desc}</div>
+    </div>
+  `).join('');
+}
+
+// ===== QUIZ =====
+let quizState = { current:0, score:0, answered:false, timer:null, timeLeft:20, shuffled:[] };
+
+function shuffleQuiz() {
+  const q = [...quizData];
+  for(let i=q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[q[i],q[j]]=[q[j],q[i]];}
+  return q.slice(0,10);
+}
+
+function startQuiz() {
+  quizState.shuffled = shuffleQuiz();
+  quizState.current = 0;
+  quizState.score = 0;
+  quizState.answered = false;
+  document.getElementById('quiz-start-screen').style.display = 'none';
+  document.getElementById('quiz-result-screen').classList.remove('show');
+  document.getElementById('quiz-game-screen').style.display = 'block';
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const q = quizState.shuffled[quizState.current];
+  const total = quizState.shuffled.length;
+  quizState.answered = false;
+
+  document.getElementById('quiz-q-num').textContent = `Pergunta ${quizState.current+1} de ${total}`;
+  document.getElementById('quiz-score-badge').textContent = `${quizState.score} pts`;
+  document.getElementById('quiz-progress').style.width = `${(quizState.current/total)*100}%`;
+  document.getElementById('quiz-category-label').innerHTML = `<span class="quiz-category-badge" style="background:var(--ouro)">${q.cat}</span>`;
+  document.getElementById('quiz-question').textContent = q.q;
+
+  const letters = ['A','B','C','D'];
+  document.getElementById('quiz-options').innerHTML = q.opts.map((opt,i)=>`
+    <button class="quiz-option" onclick="selectAnswer(${i})">
+      <span class="opt-letter">${letters[i]}</span>
+      ${opt}
+    </button>
+  `).join('');
+
+  document.getElementById('quiz-feedback').classList.remove('show');
+  document.getElementById('quiz-next-btn').classList.remove('show');
+
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(quizState.timer);
+  quizState.timeLeft = 20;
+  updateTimerDisplay();
+  quizState.timer = setInterval(()=>{
+    quizState.timeLeft--;
+    updateTimerDisplay();
+    if(quizState.timeLeft <= 0) {
+      clearInterval(quizState.timer);
+      if(!quizState.answered) timeOut();
+    }
+  },1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('quiz-timer');
+  el.textContent = `⏱️ ${quizState.timeLeft}`;
+  el.className = 'quiz-timer' + (quizState.timeLeft<=5?' urgent':'');
+}
+
+function timeOut() {
+  quizState.answered = true;
+  const q = quizState.shuffled[quizState.current];
+  document.querySelectorAll('.quiz-option').forEach((btn,i)=>{
+    btn.classList.add('answered');
+    if(i===q.ans) btn.classList.add('correct');
+  });
+  showFeedback(false, q);
+}
+
+function selectAnswer(idx) {
+  if(quizState.answered) return;
+  quizState.answered = true;
+  clearInterval(quizState.timer);
+  const q = quizState.shuffled[quizState.current];
+  const correct = idx === q.ans;
+  if(correct) quizState.score += 10;
+  document.querySelectorAll('.quiz-option').forEach((btn,i)=>{
+    btn.classList.add('answered');
+    if(i===q.ans) btn.classList.add('correct');
+    else if(i===idx && !correct) btn.classList.add('wrong');
+  });
+  showFeedback(correct, q);
+}
+
+function showFeedback(correct, q) {
+  const fb = document.getElementById('quiz-feedback');
+  fb.innerHTML = (correct ? '✅ <strong>Correto!</strong> ' : '❌ <strong>Errado!</strong> ') + q.feedback;
+  fb.classList.add('show');
+  document.getElementById('quiz-next-btn').classList.add('show');
+  document.getElementById('quiz-score-badge').textContent = `${quizState.score} pts`;
+}
+
+function nextQuestion() {
+  quizState.current++;
+  if(quizState.current >= quizState.shuffled.length) {
+    showResult();
+  } else {
+    loadQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-game-screen').style.display = 'none';
+  const rs = document.getElementById('quiz-result-screen');
+  rs.classList.add('show');
+  const pct = quizState.score / 100;
+  let stars='', trophy='', label='', msg='';
+  if(pct>=0.9){stars='⭐⭐⭐⭐⭐';trophy='🏆';label='CAMPEÃO MUNDIAL!';msg='Impressionante! Você é um verdadeiro expert em Copa do Mundo. A seleção técnica te contrataria!';}
+  else if(pct>=0.7){stars='⭐⭐⭐⭐';trophy='🥇';label='GRANDE CRAQUE!';msg='Excelente resultado! Você conhece muito bem a história da Copa. Quase perfeito!';}
+  else if(pct>=0.5){stars='⭐⭐⭐';trophy='🥈';label='BOA PARTIDA!';msg='Bom desempenho! Com um pouco mais de estudo da seção de história você chega na elite!';}
+  else if(pct>=0.3){stars='⭐⭐';trophy='🥉';label='EM DESENVOLVIMENTO';msg='Há espaço para crescer! Explore a linha do tempo e as curiosidades para aprender mais.';}
+  else{stars='⭐';trophy='😅';label='COMEÇANDO DO ZERO';msg='Não desanime! Leia as curiosidades e a história do portal e tente novamente!';}
+  document.getElementById('quiz-stars').textContent = stars;
+  document.getElementById('quiz-result-score').textContent = quizState.score;
+  document.getElementById('quiz-result-label').textContent = label;
+  document.getElementById('quiz-result-trophy').textContent = trophy;
+  document.getElementById('quiz-result-msg').textContent = msg;
+  document.getElementById('quiz-progress').style.width = '100%';
+}
+
+function restartQuiz() {
+  document.getElementById('quiz-result-screen').classList.remove('show');
+  document.getElementById('quiz-start-screen').style.display = 'block';
+}
+
+// ===== SCROLL REVEAL =====
+const revealObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); revealObserver.unobserve(e.target); }});
+},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+
+function observeReveal() {
+  document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+}
+
+// ===== INIT =====
+renderSchedule();
+renderTimeline();
+renderTeams();
+renderStadiums();
+renderPlayers();
+renderCuriosidades();
+renderVideos();
+renderRecords();
+setTimeout(observeReveal, 100);
+
+// Re-observe após renders dinâmicos
+const reObserver = setInterval(()=>{
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el=>revealObserver.observe(el));
+},1000);
+setTimeout(()=>clearInterval(reObserver), 8000);
+
+// Fechar modals clicando fora
+document.querySelectorAll('.add-modal').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('active'); });
+});
+document.getElementById('player-modal').addEventListener('click', e=>{
+  if(e.target===document.getElementById('player-modal')) closePlayerModal();
+});
+</script>
+</body>
+</html>
