@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa do Mundo 2026 — Portal Interativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<!-- CAMPO FUNDO -->
+<div class="field-bg">
+  <div class="field-stripes"></div>
+  <div class="field-center-line"></div>
+  <div class="field-center-circle"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⚽ Copa 2026</div>
+  <ul class="nav-links">
+    <li><a href="#programacao">Programação</a></li>
+    <li><a href="#timeline-section">⏳ Timeline</a></li>
+    <li><a href="#copa2026">Copa 2026</a></li>
+    <li><a href="#lendas">Lendas</a></li>
+    <li><a href="#curiosidades">💡 Curiosidades</a></li>
+    <li><a href="#videos">Vídeos</a></li>
+    <li><a href="#recordes">Recordes</a></li>
+    <li><a href="#quiz">🎯 Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div class="site-content">
+<section class="hero" id="inicio">
+  <!-- Trave superior -->
+  <div class="goal-top">
+    <div class="crossbar">
+      <div class="net"></div>
+      <div class="post-left"></div>
+      <div class="post-right"></div>
+    </div>
+  </div>
+
+  <div class="hero-badge">🏆 FIFA World Cup · 11 Jun — 19 Jul 2026</div>
+  <h1>Copa do<span>Mundo</span></h1>
+  <p class="hero-sub">EUA · Canadá · México — O Maior Espetáculo do Futebol</p>
+
+  <div class="countdown" id="countdown">
+    <div class="cd-box"><span class="cd-num" id="cd-days">53</span><span class="cd-label">Dias</span></div>
+    <div class="cd-box"><span class="cd-num" id="cd-hours">09</span><span class="cd-label">Horas</span></div>
+    <div class="cd-box"><span class="cd-num" id="cd-mins">13</span><span class="cd-label">Min</span></div>
+    <div class="cd-box"><span class="cd-num" id="cd-secs">00</span><span class="cd-label">Seg</span></div>
+  </div>
+
+  <div class="hero-ctas">
+    <a href="#programacao" class="btn-primary">📅 Ver Programação</a>
+    <a href="#timeline-section" class="btn-outline">📖 Explorar História</a>
+  </div>
+</section>
+
+<!-- ===== Barra de status ===== -->
+<div style="position:relative;z-index:1;padding:0 2rem;margin-bottom:0;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="stats-bar reveal">
+      <div class="stat-item"><span class="stat-num">48</span><span class="stat-lbl">Seleções</span></div>
+      <div class="stat-item"><span class="stat-num">104</span><span class="stat-lbl">Jogos</span></div>
+      <div class="stat-item"><span class="stat-num">16</span><span class="stat-lbl">Estádios</span></div>
+      <div class="stat-item"><span class="stat-num">3</span><span class="stat-lbl">Países</span></div>
+      <div class="stat-item"><span class="stat-num">2.271</span><span class="stat-lbl">Gols até 2022</span></div>
+      <div class="stat-item"><span class="stat-num">21</span><span class="stat-lbl">Edições</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROGRAMAÇÃO ===== -->
+<section class="section-glass" id="programacao">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">📅 Agenda Oficial</div>
+      <h2 class="section-title">Programação — Copa 2026</h2>
+      <p class="section-desc">Jogos, horários e onde assistir.</p>
+    </div>
+    <div class="schedule-grid" id="schedule-container">
+      <!-- Jogos gerados por JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ===== LINHA DO TEMPO ===== -->
+<section id="timeline-section" style="position:relative;z-index:1;">
+  <div class="timeline-wrapper">
+    <div class="section-header reveal" style="margin-bottom:3rem;">
+      <div class="section-tag">⏳ Linha do Tempo</div>
+      <h2 class="section-title">A Jornada da Copa</h2>
+      <p class="section-desc">Percorra a história completa da Copa do Mundo — de 1930 a 2022 — com a bola guiando o caminho.</p>
+    </div>
+
+    <div class="timeline-track" id="timeline-track">
+      <div class="timeline-line"></div>
+      <!-- Bola sticky -->
+      <div class="timeline-ball">
+        <div class="timeline-ball-icon">⚽</div>
+      </div>
+      <!-- Items gerados por JS -->
+      <div id="timeline-items"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===== COPA 2026 ===== -->
+<section class="section-glass" id="copa2026">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">🌎 Edição 2026</div>
+      <h2 class="section-title">Copa do Mundo 2026</h2>
+      <p class="section-desc">A maior Copa da história — 48 seleções em 3 países, 104 jogos.</p>
+    </div>
+
+    <!-- Seleções -->
+    <div class="section-header" style="margin-top:3rem;margin-bottom:1.5rem;">
+      <h3 style="font-family:var(--bebas);font-size:1.8rem;letter-spacing:2px;color:var(--ouro);">🏆 Maiores Potências</h3>
+    </div>
+    <div class="teams-grid" id="teams-grid"></div>
+
+    <!-- Estádios -->
+    <div class="section-header" style="margin-top:3rem;margin-bottom:1.5rem;">
+      <h3 style="font-family:var(--bebas);font-size:1.8rem;letter-spacing:2px;color:var(--ouro);">🏟️ Estádios Sede</h3>
+    </div>
+    <div class="stadiums-grid" id="stadiums-grid"></div>
+  </div>
+</section>
+
+<!-- ===== LENDAS — FIGURINHAS EFOOTBALL ===== -->
+<section style="position:relative;z-index:1;padding:80px 0;" id="lendas">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">⭐ Figurinhas</div>
+      <h2 class="section-title">Jogadores Lendários</h2>
+      <p class="section-desc">Clique na figurinha para ver as estatísticas completas no estilo eFootball.</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="videos-filter" style="margin-bottom:2rem;">
+      <button class="filter-btn active" onclick="filterPlayers('all', this)">Todos</button>
+      <button class="filter-btn" onclick="filterPlayers('lenda', this)">🏆 Lenda</button>
+      <button class="filter-btn" onclick="filterPlayers('ouro', this)">⭐ Ouro</button>
+      <button class="filter-btn" onclick="filterPlayers('prata', this)">🥈 Prata</button>
+    </div>
+
+    <div class="cards-grid" id="players-grid"></div>
+  </div>
+</section>
+
+<!-- Modal jogador -->
+<div class="card-detail-overlay" id="player-modal">
+  <div class="card-detail-modal">
+    <button class="modal-close" onclick="closePlayerModal()">✕</button>
+    <div class="modal-header">
+      <img class="modal-avatar" id="modal-img" src="" alt="" onerror="this.style.display='none';document.getElementById('modal-avatar-placeholder').style.display='flex'">
+      <div class="modal-avatar-placeholder" id="modal-avatar-placeholder" style="display:none;" id="modal-init">?</div>
+      <div>
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-country" id="modal-country"></div>
+        <div class="modal-era" id="modal-era"></div>
+      </div>
+    </div>
+    <div class="stats-bars" id="modal-stats"></div>
+    <div class="modal-quote" id="modal-quote"></div>
+    <div class="modal-achievements" id="modal-achievements"></div>
+  </div>
+</div>
+
+<!-- ===== CURIOSIDADES ===== -->
+<section class="section-glass" id="curiosidades">
+  <div style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+    <div class="section-header reveal" style="margin-bottom:2.5rem;">
+      <div class="section-tag">💡 Sabia Que…?</div>
+      <h2 class="section-title">Curiosidades da Copa</h2>
+      <p class="section-desc">Fatos incríveis, histórias surpreendentes e momentos únicos que moldaram o maior torneio do mundo.</p>
+    </div>
+  </div>
+  <div class="curiosidades-grid" id="curiosidades-grid"></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===== VÍDEOS ===== -->
+<section class="section-glass" id="videos">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">🎬 Momentos Históricos</div>
+      <h2 class="section-title">Vídeos & Momentos</h2>
+      <p class="section-desc">Os momentos mais marcantes da história da Copa.</p>
+    </div>
+
+    <div class="videos-filter">
+      <button class="filter-btn active" onclick="filterVideos('all', this)">Todos</button>
+      <button class="filter-btn" onclick="filterVideos('goal', this)">⚽ Gols Lendários</button>
+      <button class="filter-btn" onclick="filterVideos('final', this)">🏆 Finais Épicas</button>
+      <button class="filter-btn" onclick="filterVideos('moment', this)">⭐ Momentos</button>
+    </div>
+
+    <div class="videos-grid" id="videos-grid"></div>
+
+  </div>
+</section>
+
+<!-- ===== RECORDES ===== -->
+<section style="position:relative;z-index:1;padding:80px 0;" id="recordes">
+  <div class="section" style="padding-top:0;padding-bottom:0;">
+    <div class="section-header reveal">
+      <div class="section-tag">📊 Estatísticas</div>
+      <h2 class="section-title">Recordes Históricos</h2>
+      <p class="section-desc">Os números mais impressionantes da história da Copa do Mundo.</p>
+    </div>
+    <div class="records-grid" id="records-grid"></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ===== QUIZ ===== -->
+<section style="position:relative;z-index:1;padding:80px 0;" id="quiz">
+  <div class="section-header reveal" style="max-width:800px;margin:0 auto 2.5rem;padding:0 2rem;">
+    <div class="section-tag">🎯 Teste seus Conhecimentos</div>
+    <h2 class="section-title">Quiz da Copa do Mundo</h2>
+    <p class="section-desc">10 perguntas sobre a história da Copa. Você consegue acertar todas?</p>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card" id="quiz-card">
+      <!-- Tela inicial -->
+      <div id="quiz-start-screen" style="text-align:center;padding:1rem 0;">
+        <div style="font-size:5rem;margin-bottom:1rem;">⚽</div>
+        <div style="font-family:var(--bebas);font-size:2.5rem;letter-spacing:3px;color:var(--ouro);margin-bottom:0.75rem;">QUIZ DA COPA</div>
+        <p style="color:rgba(255,255,255,0.65);font-size:0.95rem;line-height:1.7;max-width:400px;margin:0 auto 2rem;">
+          10 perguntas sobre história, recordes, gols e momentos épicos da Copa do Mundo. Cada acerto vale 10 pontos!
+        </p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;">
+          <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:0.75rem 1.5rem;text-align:center;">
+            <div style="font-family:var(--bebas);font-size:1.5rem;color:var(--ouro);">10</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;font-weight:700;">Perguntas</div>
+          </div>
+          <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:0.75rem 1.5rem;text-align:center;">
+            <div style="font-family:var(--bebas);font-size:1.5rem;color:var(--ouro);">20s</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;font-weight:700;">Por Pergunta</div>
+          </div>
+          <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:0.75rem 1.5rem;text-align:center;">
+            <div style="font-family:var(--bebas);font-size:1.5rem;color:var(--ouro);">100</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;font-weight:700;">Pts Máximos</div>
+          </div>
+        </div>
+        <button class="game-start-btn" onclick="startQuiz()">🚀 INICIAR QUIZ</button>
+      </div>
+
+      <!-- Tela de jogo -->
+      <div id="quiz-game-screen" style="display:none;">
+        <div class="quiz-progress-bar">
+          <div class="quiz-progress-fill" id="quiz-progress" style="width:0%"></div>
+        </div>
+        <div class="quiz-meta">
+          <div class="quiz-q-num" id="quiz-q-num">Pergunta 1 de 10</div>
+          <div style="display:flex;gap:0.75rem;align-items:center;">
+            <div class="quiz-timer" id="quiz-timer">⏱️ 20</div>
+            <div class="quiz-score-badge" id="quiz-score-badge">0 pts</div>
+          </div>
+        </div>
+        <div id="quiz-category-label" style="margin-bottom:1rem;"></div>
+        <div class="quiz-question" id="quiz-question">Carregando pergunta...</div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-feedback" id="quiz-feedback"></div>
+        <div class="quiz-nav">
+          <div></div>
+          <button class="quiz-next-btn" id="quiz-next-btn" onclick="nextQuestion()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Tela de resultado -->
+      <div class="quiz-result" id="quiz-result-screen">
+        <div class="quiz-result-ball">⚽</div>
+        <div class="quiz-stars" id="quiz-stars"></div>
+        <div class="quiz-result-score" id="quiz-result-score">100</div>
+        <div class="quiz-result-label" id="quiz-result-label">PONTOS</div>
+        <div class="quiz-trophy" id="quiz-result-trophy">🏆</div>
+        <div class="quiz-result-msg" id="quiz-result-msg">Parabéns!</div>
+        <button class="game-start-btn" onclick="restartQuiz()">🔄 JOGAR NOVAMENTE</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GOL FUNDO + FOOTER ===== -->
+<div class="footer-goal" style="position:relative;z-index:1;padding-bottom:0;">
+  <div class="goal-bottom">
+    <div class="field-area"></div>
+    <div class="crossbar-b" style="position:relative;">
+      <div class="net-b"></div>
+      <div class="post-left-b"></div>
+      <div class="post-right-b"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">⚽ Copa 2026</span>
+  <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;">O Portal Interativo do Maior Espetáculo do Futebol</p>
+  <div class="footer-links">
+    <a href="#programacao">Programação</a>
+    <a href="#timeline-section">Timeline</a>
+    <a href="#copa2026">Copa 2026</a>
+    <a href="#lendas">Lendas</a>
+    <a href="#curiosidades">Curiosidades</a>
+    <a href="#videos">Vídeos</a>
+    <a href="#recordes">Recordes</a>
+    <a href="#quiz">Quiz</a>
+  </div>
+  <p class="footer-copy">Dados: FIFA.com · Transfermarkt · ESPN Stats · Wikipedia<br>© 2026 Portal Copa do Mundo — Conteúdo informativo e educativo</p>
+</footer>
+
+</div>
+
+<!-- fim do conteúdo do site -->
+
+<script src="script.js"></script>
+</body>
+</html>
