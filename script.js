@@ -242,7 +242,7 @@ const videosData = [
     ytId:'Gkr7FopP65g',
     title:'Gol do Neymar contra a Croacia',
     year:2022,cat:'goal',
-    desc:'Mbappé marca três gols na final — o segundo hat-trick em finais da história.',
+    desc:'Neymar marca um golaço contra a Croácia na Copa do Mundo de 2022 — um dos momentos mais decisivos da seleção brasileira no torneio.',
     url:'https://youtu.be/Gkr7FopP65g'
   },
 ];
