@@ -9,7 +9,7 @@ const historyData = [
   {year:1954,champion:'🇩🇪 Alemanha',host:'Suíça',vice:'Hungria',note:'Milagre de Berna'},
   {year:1958,champion:'🇧🇷 Brasil',host:'Suécia',vice:'Suécia',note:'Pelé com 17 anos'},
   {year:1962,champion:'🇧🇷 Brasil',host:'Chile',vice:'Tchecoslováquia',note:'Garrincha brilha'},
-  {year:1966,champion:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra',host:'Inglaterra',vice:'Alemanha',note:'Único título da Inglaterra'},
+  {year:1966,champion:'in Inglaterra',host:'Inglaterra',vice:'Alemanha',note:'Único título da Inglaterra'},
   {year:1970,champion:'🇧🇷 Brasil',host:'México',vice:'Itália',note:'A Copa do Mundo Perfeita'},
   {year:1974,champion:'🇩🇪 Alemanha',host:'Alemanha',vice:'Holanda',note:'Laranja Mecânica de Cruyff'},
   {year:1978,champion:'🇦🇷 Argentina',host:'Argentina',vice:'Holanda',note:'Argentina em casa'},
